@@ -9,9 +9,9 @@
 export default {
   data() {
     return {
-      greeting: "Hello",
       transcription_result: "No request made yet.",
-      video_url: ""
+      video_url: "",
+      translation_option: "null"
     }
   },
   methods: {
@@ -19,7 +19,8 @@ export default {
       let data = {
         "video_url" : this.video_url
       }
-
+      
+      console.log("Translation Request:" + this.translation_option)
       this.transcription_result = "Processing..."
 
       fetch("http://localhost:4999/transcribe", {
@@ -45,38 +46,55 @@ export default {
 
   
   <main>
-    <h1>{{ greeting }} from Transcriber</h1>
-    <span>{{ transcription_result }}</span>
-    <input type="url" v-model="video_url" placeholder="YouTube URL" id="youtube-url">
-    <button v-on:click="getTranscription">Transcribe</button>
+    <div class="queryBox">
+      <h1 class="queryBoxElements">👋 Welcome to Transcriber!</h1>
+      <span class="queryBoxElements" id="description">
+        Transcriber takes your YouTube URL and translates it using 
+        <a href="https://google.com">OpenAI's Whisper</a>
+        according to your specifications. Enjoy!</span>
+      <input class="queryBoxElements" type="url" v-model="video_url" placeholder="YouTube URL" id="youtube-url">
+      <select class="queryBoxElements" id="tranlateOptions" v-model="translation_option">
+        <option value="null">No Translation</option>
+        <option value="en">English</option>
+        <option value="fr">French</option>
+      </select>
+      <button class="queryBoxElements" v-on:click="getTranscription">Transcribe</button>
+      <span id="result" class="queryBoxElements">{{ transcription_result }}</span>
+    </div>
   </main>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-}
 
-.logo {
+#result {
   display: block;
-  margin: 0 auto 2rem;
+  background-color:beige;
+  border-radius: 8px;
+  padding: 5px 10px;
+  color: black;
+  border-style:inset;
+  border-width: 1.5px;
+}
+input {
+  display: block;
+  width:fit-content;
+}
+button {
+  display: block;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+/* Top Text */
+h1 {
+  color: white;
+  font-size: 40px;
+  text-align: center;
+}
+#description {
+  display: block;
+  font-size: 20px;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.queryBoxElements  {
+  margin: 15px 10px;
 }
 </style>
