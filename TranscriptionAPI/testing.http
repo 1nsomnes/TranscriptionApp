@@ -1,0 +1,6 @@
+POST http://localhost:4999/transcribe 
+Content-Type: application/json
+
+{
+    "video_url": "https://www.youtube.com/watch?v=YvKebifmXrI"
+}
