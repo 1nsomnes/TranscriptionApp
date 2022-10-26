@@ -31,6 +31,7 @@ def is_supported(url):
 
 transcribe_req_args = reqparse.RequestParser()
 transcribe_req_args.add_argument("video_url", type=str, help="YouTube video URL to transcribe from.", required=True)
+transcribe_req_args.add_argument("translate", type=str, help="Should the transcription be translated (null for no, two letter language identifier for yes).", required=True)
 
 class Transcribe(Resource):
   def post(self):

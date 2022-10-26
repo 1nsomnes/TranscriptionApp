@@ -17,10 +17,10 @@ export default {
   methods: {
     getTranscription() {
       let data = {
-        "video_url" : this.video_url
+        "video_url" : this.video_url,
+        "translate" : this.translation_option
       }
       
-      console.log("Translation Request:" + this.translation_option)
       this.transcription_result = "Processing..."
 
       fetch("http://localhost:4999/transcribe", {
@@ -34,6 +34,7 @@ export default {
       }).catch(e => {
         console.log("BIG error lol: " + e)
       })
+      
      
     }
   }
