@@ -32,7 +32,7 @@ export default {
           this.transcription_result = json_obj['whisper-response']
         })
       }).catch(e => {
-        console.log("BIG error lol: " + e)
+        this.transcription_result = "Error communicating with api: " + e;
       })
       
      

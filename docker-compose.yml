@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  web:
+    build: ./TranscriptionFrontend
+    ports:
+      - 4998:4998
+    networks:
+      - net
+  api:
+    build: ./TranscriptionAPI
+    ports:
+      - 4999:4999
+    networks:
+      - net
+
+networks:
+  net: 
+    driver: bridge
