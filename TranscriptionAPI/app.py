@@ -4,7 +4,6 @@ from flask_cors import CORS
 import youtube_dl
 import whisper
 import os 
-import requests
 
 app = Flask(__name__)
 api = Api(app)
@@ -54,13 +53,7 @@ class Transcribe(Resource):
 
     return { "whisper-response" : result["text"] }
 
-class Test(Resource):
-  def get(self):
-    print(requests.get("http://web:4998"))
-    return { "response" : requests.get("http://web:4998") } 
-
 api.add_resource(Transcribe, "/transcribe")
-api.add_resource(Test, "/test")
 
 if __name__ == '__main__':
    app.run(host="0.0.0.0", port=4999, debug=True)
