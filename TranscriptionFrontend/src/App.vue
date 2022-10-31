@@ -16,6 +16,16 @@ export default {
     }
   },
   methods: {
+    buttonClicked() {
+      switch (this.transcriber_option) {
+        case 'tyt':
+          this.getTranscription();
+          break;
+        default:
+          console.log('other called');
+          break;
+      }
+    },
     getTranscription() {
       let data = {
         "video_url": this.video_url,
@@ -35,8 +45,6 @@ export default {
       }).catch(e => {
         this.transcription_result = "Error communicating with api: " + e;
       })
-
-
     }
   }
 }
@@ -64,7 +72,7 @@ export default {
         </select>
 
         <input v-if="transcriber_option == 'dyt' || transcriber_option == 'tyt'" type="text" placeholder="YouTube Url"
-          id="yturl" class="tinputs">
+          id="yturl" class="tinputs" v-model="video_url">
 
         <h2 v-if="transcriber_option == 'tl'" class="tinputs">Support for this feature doesn't exist yet...</h2>
         
@@ -73,7 +81,7 @@ export default {
           <span id="resultSpan" class="tinputs">{{ transcription_result }}</span>
         </div>
 
-        <button id="transcribe" class="tinputs">
+        <button id="transcribe" class="tinputs" v-on:click="buttonClicked()">
           Transcribe
         </button>
       </div>
