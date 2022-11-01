@@ -19,14 +19,17 @@ export default {
     buttonClicked() {
       switch (this.transcriber_option) {
         case 'tyt':
-          this.getTranscription();
+          this.getTranscriptionYt();
           break;
+        case 'dyt':
+          this.downloadYt();
         default:
           console.log('other called');
           break;
       }
     },
-    getTranscription() {
+
+    getTranscriptionYt() {
       let data = {
         "video_url": this.video_url,
         "translate": this.translation_option
@@ -34,7 +37,7 @@ export default {
 
       this.transcription_result = "Processing..."
 
-      fetch("http://localhost:4999/transcribe", {
+      fetch("http://localhost:4999/transcribeyt", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -45,6 +48,31 @@ export default {
       }).catch(e => {
         this.transcription_result = "Error communicating with api: " + e;
       })
+    },
+
+    downloadYt() {
+      let data = {
+        "video_url" : this.video_url
+      }
+
+      fetch("http://localhost:4999/downloadyt", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(res => {
+        res.json().then((json_obj) => {
+          console.log(json_obj)
+          this.transcription_result = "Pee pee"
+        })
+      }).catch(e => {
+        this.transcription_result = "Error communicating with api: " + e;
+      })
+    },
+
+    updatedSelect() {
+      if(this.transcriber_option == 'tmp3' || this.transcriber_option == 'tyt') {
+        this.transcription_result = 'No request made yet.';
+      }
     }
   }
 }
@@ -64,7 +92,7 @@ export default {
         according to your specifications. Enjoy!
       </span>
       <div id="container">
-        <select v-model="transcriber_option" id="toptions">
+        <select v-model="transcriber_option" v-on:change="updatedSelect" id="toptions">
           <option value="dyt">Download YouTube Video</option>
           <option value="tmp3">Transcribe From MP3</option>
           <option value="tyt">Transcribe From YouTube</option>

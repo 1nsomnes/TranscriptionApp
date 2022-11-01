@@ -1,15 +1,15 @@
-from flask import Flask
+from flask import Flask, send_file
 from flask_restful import Resource, Api, reqparse, abort
 from flask_cors import CORS
 import youtube_dl
 import whisper
-import os 
+import os
 
 app = Flask(__name__)
 api = Api(app)
-CORS(app) #allow cors 
+CORS(app)  # allow cors
 
-ydl_opts = {
+mp3_opts = {
     'ignoreerrors': True,
     'outtmpl': 'Downloads/%(title)s.%(etx)s',
     'format': 'bestaudio/best',
@@ -22,6 +22,12 @@ ydl_opts = {
     'prefer_ffmpeg': True
 }
 
+mp4_opts = {
+    'format': 'bestvideo[height<=?720]+bestaudio[ext=m4a]/best',
+    'outtmpl': 'Downloads/%(title)s.%(ext)s'
+}
+
+
 def is_supported(url):
     extractors = youtube_dl.extractor.gen_extractors()
     for e in extractors:
@@ -29,31 +35,60 @@ def is_supported(url):
             return True
     return False
 
-transcribe_req_args = reqparse.RequestParser()
-transcribe_req_args.add_argument("video_url", type=str, help="YouTube video URL to transcribe from.", required=True)
-transcribe_req_args.add_argument("translate", type=str, help="Should the transcription be translated (null for no, two letter language identifier for yes).", required=True)
 
-class Transcribe(Resource):
-  def post(self):
-    args = transcribe_req_args.parse_args()
+transcribeyt_args = reqparse.RequestParser()
+transcribeyt_args.add_argument(
+    "video_url", type=str, help="YouTube video URL to transcribe from.", required=True)
+transcribeyt_args.add_argument(
+    "translate", type=str, help="Should the transcription be translated (null for no, two letter language identifier for yes).", required=True)
 
-    if is_supported(args["video_url"]) == False:
-      return {"whisper-response" : "YouTube URL provided is invalid."}
+downloadyt_args = reqparse.RequestParser()
+downloadyt_args.add_argument(
+    "video_url", type=str,  help="YouTube video URL to download from.", required=True)
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-      ydl.download([args["video_url"]])
-      info_dict = ydl.extract_info(args["video_url"])
-      
-      path = "Downloads/" + info_dict.get("title", None) + ".mp3"
 
-    model = whisper.load_model("base")
-    result = model.transcribe(path)
+# YouTube URL --> Transcription
+class TranscribeYT(Resource):
+    def post(self):
+        args = transcribeyt_args.parse_args()
 
-    os.remove(path)
+        if is_supported(args["video_url"]) == False:
+            return {"whisper-response": "YouTube URL provided is invalid."}
 
-    return { "whisper-response" : result["text"] }
+        with youtube_dl.YoutubeDL(mp3_opts) as ydl:
+            ydl.download([args["video_url"]])
+            info_dict = ydl.extract_info(args["video_url"])
 
-api.add_resource(Transcribe, "/transcribe")
+            path = "Downloads/" + info_dict.get("title", None) + ".mp3"
+        print("\nTest\n")
+        model = whisper.load_model("base")
+        result = model.transcribe(path)
 
+        os.remove(path)
+
+        return {"whisper-response": result["text"]}
+
+
+# YouTube Downloader
+class DownloadYT(Resource):
+    def post(self):
+        args = downloadyt_args.parse_args()
+
+        if is_supported(args["video_url"]) == False:
+            abort(500, "Invalid url")
+
+        with youtube_dl.YoutubeDL(mp4_opts) as ydl:
+            ydl.download([args["video_url"]])
+            info_dict = ydl.extract_info(args["video_url"])
+
+            path = "Downloads/" + info_dict.get("title", None) + ".mp4"
+        print("\nTest\n")
+        return send_file(path, mimetype="video/mp4")
+
+
+api.add_resource(DownloadYT, "/downloadyt")
+api.add_resource(TranscribeYT, "/transcribeyt")
+
+#only used when not in docker container
 if __name__ == '__main__':
-   app.run(host="0.0.0.0", port=4999, debug=True)
+    app.run(host="0.0.0.0", port=4999, debug=True)
