@@ -82,7 +82,8 @@ class DownloadYT(Resource):
             info_dict = ydl.extract_info(args["video_url"])
 
             path = "Downloads/" + info_dict.get("title", None) + ".mp4"
-        print("\nTest\n")
+        
+        #sends blob
         return send_file(path, mimetype="video/mp4")
 
 
