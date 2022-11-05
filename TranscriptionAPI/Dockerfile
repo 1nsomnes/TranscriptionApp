@@ -16,4 +16,5 @@ COPY . .
 
 EXPOSE 4999
 
-CMD ["gunicorn", "--bind", "0.0.0.0:4999", "wsgi:app"]
+#CMD ["gunicorn", "--bind", "0.0.0.0:4999", "wsgi:app"] stops mid process with wsgi and gunicorn 
+CMD ["python3", "app.py"]

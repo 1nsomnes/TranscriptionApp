@@ -60,7 +60,7 @@ class TranscribeYT(Resource):
             info_dict = ydl.extract_info(args["video_url"])
 
             path = "Downloads/" + info_dict.get("title", None) + ".mp3"
-        print("\nTest\n")
+        
         model = whisper.load_model("base")
         result = model.transcribe(path)
 
