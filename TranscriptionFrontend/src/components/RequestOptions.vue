@@ -5,12 +5,14 @@ export default {
             transcription_result: "No request made yet.",
             video_url: "",
             translation_option: "null",
-            transcriber_option: "dyt"
+            transcriber_option: "dyt",
+            request_error: ""
         }
     },
     methods: {
         buttonClicked() {
-            this.$router.push('/request')
+            this.request_error = '';
+            //this.$router.push('/request')
             switch (this.transcriber_option) {
                 case 'tyt':
                     this.getTranscriptionYt();
@@ -41,7 +43,7 @@ export default {
                     this.transcription_result = json_obj['whisper-response']
                 })
             }).catch(e => {
-                this.transcription_result = "Error communicating with api: " + e;
+                this.request_error = e;
             })
         },
 
@@ -55,21 +57,18 @@ export default {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             }).then(res => {
-
-                res.blob().then((blob) => {
-                    // answer from stackoverflow :/
-                    // https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch 
-
-                    var url = window.URL.createObjectURL(blob);
-                    var a = document.createElement('a');
-                    a.href = url;
-                    a.download = "result.mp4";
-                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-                    a.click();
-                    a.remove();  //afterwards we remove the element again
+                if(res.status === 500) {
+                    res.text().then(text => {
+                        this.request_error = "Error: " + text;
+                    });
+                    return;
+                }
+                
+                res.json().then(json => {
+                    this.$router.push('/request/' + json['request-number'])
                 })
             }).catch(e => {
-                this.transcription_result = "Error communicating with api: " + e;
+                this.request_error = "ERROR:" + e;
             })
         },
 
@@ -97,6 +96,8 @@ export default {
     <input v-if="transcriber_option == 'dyt' || transcriber_option == 'tyt'" type="text" placeholder="YouTube Url"
         id="yturl" class="tinputs" v-model="video_url">
 
+    <h3 v-if="request_error != ''" class="tinputs">{{ request_error }}</h3>
+    
     <h2 v-if="transcriber_option == 'tl'" class="tinputs">Support for this feature doesn't exist yet...</h2>
 
     <div v-if="transcriber_option == 'tmp3' || transcriber_option == 'tyt'" id="result">
