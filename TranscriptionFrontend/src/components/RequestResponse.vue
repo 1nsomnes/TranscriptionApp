@@ -2,13 +2,13 @@
 export default {
     data() {
         return {
-            reqeustProgress: '0',
+            requestProgress: '0',
             updateDownload: null
         }
     },
     created: function() {
         this.updateDownload = setInterval(() => {
-            fetch('http://localhost:4999/rprogress', {
+            fetch('http://localhost:4999/rprogress/' + this.$route.params.id, {
                 method: 'GET'
             }).then(res => {
                 if(res.status == '500') {
@@ -18,6 +18,9 @@ export default {
 
                 res.text().then(text => {
                     this.requestProgress = text;
+                    if(this.requestProgress === '100') {
+                        clearInterval(this.updateDownload)
+                    }
                 })
             })
         }, 1000);
@@ -40,6 +43,6 @@ export default {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen></iframe>
 
-    <p>Request Progress: {{ requestProgress }}</p>
+    <p>Request Progress: {{ requestProgress }}%</p>
 
 </template>

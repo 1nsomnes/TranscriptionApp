@@ -1,4 +1,4 @@
-from flask import Flask, send_file, Response
+from flask import Flask, send_file, Response, make_response, request
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
 import youtube_dl
@@ -48,9 +48,15 @@ downloadyt_args.add_argument(
 
 
 class RequestProgress(Resource):
-    def get(self):
+    def get(self, index):
         global request_threads
-        return request_threads[1].progress
+        percent = request_threads[index].progress['downloaded_bytes']/request_threads[index].progress['total_bytes']
+        percent = percent * 100
+        percent = round(percent, 2)
+        response = make_response(str(percent), 200)
+        response.mimetype = "text/plain"
+
+        return response
 
 class RequestFilename(Resource):
     def get(self):
@@ -106,7 +112,6 @@ class DownloadYT(Resource):
             shutil.rmtree(path)
         else:
             os.mkdir(path)
-        
 
         request_threads[index] = YtDownloadManager(UrlRequest(args["video_url"], "Result.mp4", index))
         request_threads[index].start()
@@ -119,7 +124,7 @@ class DownloadYT(Resource):
 
 api.add_resource(DownloadYT, "/downloadyt")
 api.add_resource(TranscribeYT, "/transcribeyt")
-api.add_resource(RequestProgress, "/rprogress")
+api.add_resource(RequestProgress, "/rprogress/<int:index>")
 
 # only used when not in docker container
 if __name__ == '__main__':
