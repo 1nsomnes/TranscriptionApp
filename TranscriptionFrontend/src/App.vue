@@ -19,12 +19,13 @@
 
   <main>
     <div id="box">
-      <h1>👋 Welcome to Transcriber!</h1>
+      <h1>T R A N S C R I B E R</h1>
       <span class="queryBoxElements" id="description">
-        Transcriber takes your YouTube URL and translates it using 
+        Integration of
         <a href="https://google.com">OpenAI's Whisper</a>
-        according to your specifications. Enjoy!
+        for transcription.
       </span>
+      <span style="color:white; font-weight: bold;">-</span>
       <div id="container">
         <router-view/>
       </div>

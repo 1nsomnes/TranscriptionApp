@@ -9,7 +9,7 @@ import './assets/main.css'
 
 const routes = [
     { path: '/', component: RequestOptions },
-    { path: '/request', component: RequestResponse }
+    { path: '/request/:id', component: RequestResponse }
 ]
 
 const router = createRouter({
@@ -18,6 +18,8 @@ const router = createRouter({
 })
 
 const app = createApp(App);
+
 app.use(router)
+
 app.mount("#app")
 
