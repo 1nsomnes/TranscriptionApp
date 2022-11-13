@@ -106,6 +106,6 @@ export default {
     </div>
 
     <button id="transcribe" class="tinputs" v-on:click="buttonClicked()">
-        Transcribe
+        Transcribe ➔
     </button>
 </template>
