@@ -20,7 +20,7 @@
     background-color: transparent;
     border-style: solid;
     border-radius: 20px;
-    border-color:white;
+    border-color:hsla(160, 100%, 37%, 1);
     font-weight: bold;
     display: block;
     margin-top: 20px;
@@ -31,12 +31,18 @@
 
 #transcribe:hover {
     cursor: pointer;
+    transform: scale(1.1);
+    transition:ease-in-out 0.1s;
 }
 
 #yturl {
     width: calc(100% - 10px);
     padding: 7px 14px;
-    border-radius: 10px;
+    background-color: transparent;
+    color:white;
+    border-width: 0px 0px 0.5px 0px;
+    border-style: solid;
+    border-color: lightgray;
 }
 
 #result>h2 {

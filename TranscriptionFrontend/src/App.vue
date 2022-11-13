@@ -25,6 +25,7 @@
         <a href="https://google.com">OpenAI's Whisper</a>
         for transcription.
       </span>
+      <span style="color:white; font-weight: bold;">-</span>
       <div id="container">
         <router-view/>
       </div>

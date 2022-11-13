@@ -1,25 +1,40 @@
 import os
+import threading;
+import youtube_dl
 
 class UrlRequest:
-    def __init__(self, url:str, progress:int, filename:str):
+    def __init__(self, url:str, filename:str, request_num:int):
         self.url = url
-        self.progress = progress
         self.filename = filename
 
-class RequestManager:
-    request_index = 1
-    request_items = {}
+class YtDownloadManager(threading.Thread):
+    progress = "Loading..."
+    request_info:UrlRequest
 
-    @staticmethod
-    def create_request(url_request):
-        rm = RequestManager
-        rm.request_items[rm.request_index] = url_request
+    def progressUpdate(self,d):
+        global progress
+        progress = d
 
-        os.mkdir("Requests/" + str(rm.request_index))
+    def __init__(self, request_info:UrlRequest):
+        self.request_info = request_info
+        super().__init__()
 
-        rm.request_index = rm.request_index + 1
-        return (rm.request_index - 1)
+    def run(self):
+        global request_info
+        global progressUpdate
 
-    @staticmethod
-    def get_progress(index):
-        return RequestManager.request_items[index].progress
+        mp4_opts = {
+            'format': 'bestvideo[height<=?720]+bestaudio[ext=m4a]/best',
+            'outtmpl': f'Requests/{str(request_info.request_num)}/{request_info.filename}',
+            'progress_hooks': [progressUpdate]
+        }
+        
+        with youtube_dl.YoutubeDL(mp4_opts) as ydl:
+                ydl.download((request_info.url,)) #use when python only recognizes first letter of string
+
+class TranscriptionManager(threading.Thread):
+    progress = "Loading..."
+
+    def __init__(self, request_info:UrlRequest):
+        
+        super().__init__()

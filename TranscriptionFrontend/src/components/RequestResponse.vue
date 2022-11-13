@@ -2,11 +2,12 @@
 export default {
     data() {
         return {
-            reqeustProgress: '0'
+            reqeustProgress: '0',
+            updateDownload: null
         }
     },
     created: function() {
-        let updateDownload = setInterval(() => {
+        this.updateDownload = setInterval(() => {
             fetch('http://localhost:4999/rprogress', {
                 method: 'GET'
             }).then(res => {

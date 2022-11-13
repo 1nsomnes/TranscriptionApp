@@ -3,9 +3,12 @@ from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
 import youtube_dl
 import whisper
-import os
+import os, shutil
 import threading
-from request_manager import RequestManager, UrlRequest
+from request_manager import YtDownloadManager, UrlRequest
+
+request_threads = {}
+request_index = 1
 
 app = Flask(__name__)
 api = Api(app)
@@ -46,7 +49,8 @@ downloadyt_args.add_argument(
 
 class RequestProgress(Resource):
     def get(self):
-        return RequestManager.get_progress(1)
+        global request_threads
+        return request_threads[1].progress
 
 class RequestFilename(Resource):
     def get(self):
@@ -87,32 +91,29 @@ class TranscribeYT(Resource):
 
 # YouTube Downloader
 class DownloadYT(Resource):
-    def phook(self, d):
-        RequestManager.request_items[1].progress = d
-
     def post(self):
+        global request_index
+        
         args = downloadyt_args.parse_args()
 
         if is_supported(args["video_url"]) == False:
             return Response("URL submitted was invalid...", status=500)
 
-        requestNum = RequestManager.create_request(UrlRequest(args["video_url"], 0, "Result.mp4"))
+        index = request_index
+        path = f"Requests/{index}"
 
-        mp4_opts = {
-            'format': 'bestvideo[height<=?720]+bestaudio[ext=m4a]/best',
-            'outtmpl': f'Requests/{str(requestNum)}/' + 'Result.%(ext)s',
-            'progress_hooks': [self.phook]
-        }
-
-        def downloadYt():
-            with youtube_dl.YoutubeDL(mp4_opts) as ydl:
-                ydl.download((args['video_url'],)) #use when python only recognizes first letter of string
-
-        t = threading.Thread(name="thred", target=downloadYt)
-        t.setDaemon(True)
-        t.start()
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        else:
+            os.mkdir(path)
         
-        return {"request-number": str(requestNum)}
+
+        request_threads[index] = YtDownloadManager(UrlRequest(args["video_url"], "Result.mp4", index))
+        request_threads[index].start()
+
+        request_index = request_index + 1
+        
+        return {"request-number": str(index)}
             
 
 
