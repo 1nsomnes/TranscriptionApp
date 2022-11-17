@@ -7,27 +7,57 @@ export default {
             requestDone: false
         }
     },
-    created: function() {
+    methods: {
+        downloadClicked() {
+            fetch('http://localhost:4999/rdownload/' + this.$route.params.id, {
+                method: 'GET'
+            }).then(res => {
+                if (res.status == '500') { }
+                
+                
+                /*console.log(res.headers)
+                const header = res.headers.get('Content-Disposition');
+                console.log(header)
+                const parts = header.split(';');
+                filename = parts[1].split('=')[1];*/
+
+                res.blob().then((blob) => {
+                    // answer from stackoverflow :/
+                    // https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch 
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = "result.mp3";
+                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                    a.click();
+                    a.remove();  //afterwards we remove the element again
+                })
+            })
+        }
+    },
+    created: function () {
         this.updateDownload = setInterval(() => {
             fetch('http://localhost:4999/rprogress/' + this.$route.params.id, {
                 method: 'GET'
             }).then(res => {
-                if(res.status == '500') {
+                if (res.status == '500') {
                     clearInterval(updateDownload);
                     console.log("received error")
                 }
 
                 res.text().then(text => {
                     this.requestProgress = text;
-                    if(this.requestProgress === 'done') {
+                    if (this.requestProgress === 'done') {
                         clearInterval(this.updateDownload)
                         this.requestDone = true
                     }
                 })
+            }).catch(e => {
+                clearInterval(this.updateDownload)
             })
         }, 1000);
     },
-    beforeUnmount: function() {
+    beforeUnmount: function () {
         clearInterval(this.updateDownload);
     }
 }
@@ -47,6 +77,6 @@ export default {
 
     <p>Request Progress: {{ requestProgress }}</p>
 
-    <input v-if="requestDone == true" type="button" value="Download">
+    <input v-if="requestDone == true" v-on:click="downloadClicked()" type="button" value="Download">
 
 </template>

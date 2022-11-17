@@ -58,16 +58,20 @@ class RequestProgress(Resource):
 
         return response
 
+#this is the hacky way get content-disposition working! 
 class RequestFilename(Resource):
-    def get(self):
-
+    def get(self, index):
+        base_path = f"Requests/{index}/"
+        filename = os.listdir(base_path)[0]
         return {}
 
 
 class RequestResult(Resource):
-    def post(self):
-        
-        return {}
+    def get(self, index):
+        base_path = f"Requests/{index}/"
+        filename = os.listdir(base_path)[0]
+
+        return send_file(base_path + filename, as_attachment=True, download_name=filename)
 
 # YouTube URL --> Transcription
 class TranscribeYT(Resource):
@@ -129,6 +133,8 @@ class DownloadYT(Resource):
 api.add_resource(DownloadYT, "/downloadyt")
 api.add_resource(TranscribeYT, "/transcribeyt")
 api.add_resource(RequestProgress, "/rprogress/<int:index>")
+api.add_resource(RequestResult, "/rdownload/<int:index>")
+api.add_resource(RequestFilename, "/rfilename/<int:index>")
 
 # only used when not in docker container
 if __name__ == '__main__':
