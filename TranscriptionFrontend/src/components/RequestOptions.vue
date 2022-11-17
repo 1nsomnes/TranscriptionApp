@@ -4,6 +4,7 @@ export default {
         return {
             transcription_result: "No request made yet.",
             video_url: "",
+            ytformat: "mp3",
             translation_option: "null",
             transcriber_option: "dyt",
             request_error: ""
@@ -12,7 +13,6 @@ export default {
     methods: {
         buttonClicked() {
             this.request_error = '';
-            //this.$router.push('/request')
             switch (this.transcriber_option) {
                 case 'tyt':
                     this.getTranscriptionYt();
@@ -49,7 +49,8 @@ export default {
 
         downloadYt() {
             let data = {
-                "video_url": this.video_url
+                "video_url": this.video_url,
+                "format": this.ytformat
             }
 
             fetch("http://localhost:4999/downloadyt", {
@@ -88,10 +89,16 @@ export default {
 <template>
     <select v-model="transcriber_option" v-on:change="updatedSelect" id="toptions">
         <option value="dyt">Download YouTube Video</option>
-        <option value="tmp3">Transcribe From MP3</option>
+        <option value="tfile">Transcribe From File</option>
         <option value="tyt">Transcribe From YouTube</option>
         <option value="tl">Live Transcription</option>
     </select>
+
+    <input v-model="ytformat" v-if="transcriber_option == 'dyt'" id="ytformat1" class="ytformat" type="radio" name="ytformat" value="mp3" checked>
+    <label v-if="transcriber_option == 'dyt'" for="ytformat1">MP3</label>
+    <input v-model="ytformat" v-if="transcriber_option == 'dyt'" id="ytformat2" class="ytformat" type="radio" name="ytformat" value="mp4"> 
+    <label v-if="transcriber_option == 'dyt'" for="ytformat2">MP4</label>
+
 
     <input v-if="transcriber_option == 'dyt' || transcriber_option == 'tyt'" type="text" placeholder="YouTube Url"
         id="yturl" class="tinputs" v-model="video_url">
@@ -100,7 +107,7 @@ export default {
     
     <h2 v-if="transcriber_option == 'tl'" class="tinputs">Support for this feature doesn't exist yet...</h2>
 
-    <div v-if="transcriber_option == 'tmp3' || transcriber_option == 'tyt'" id="result">
+    <div v-if="transcriber_option == 'tfile' || transcriber_option == 'tyt'" id="result">
         <h2 class="tinputs">Result:</h2>
         <span id="resultSpan" class="tinputs">{{ transcription_result }}</span>
     </div>

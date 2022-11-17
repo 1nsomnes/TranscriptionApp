@@ -4,7 +4,6 @@ from flask_cors import CORS
 import youtube_dl
 import whisper
 import os, shutil
-import threading
 from request_manager import YtDownloadManager, UrlRequest
 
 request_threads = {}
@@ -45,15 +44,16 @@ transcribeyt_args.add_argument(
 downloadyt_args = reqparse.RequestParser()
 downloadyt_args.add_argument(
     "video_url", type=str,  help="YouTube video URL to download from.", required=True)
+downloadyt_args.add_argument("format", type=str, help="The format of the video, mp3 or mp4.")
 
 
 class RequestProgress(Resource):
     def get(self, index):
         global request_threads
-        percent = request_threads[index].progress['downloaded_bytes']/request_threads[index].progress['total_bytes']
-        percent = percent * 100
-        percent = round(percent, 2)
-        response = make_response(str(percent), 200)
+        #percent = request_threads[index].progress['downloaded_bytes']/request_threads[index].progress['total_bytes']
+        #percent = percent * 100
+        #percent = round(percent, 2)
+        response = make_response(request_threads[index].progress, 200)
         response.mimetype = "text/plain"
 
         return response
@@ -105,6 +105,10 @@ class DownloadYT(Resource):
         if is_supported(args["video_url"]) == False:
             return Response("URL submitted was invalid...", status=500)
 
+        if args["format"] != "mp3" and args["format"] != "mp4":
+            return Response("Format is not an options. Please use mp3 or mp4.", 500)
+        
+        file_format = args["format"]
         index = request_index
         path = f"Requests/{index}"
 
@@ -113,7 +117,7 @@ class DownloadYT(Resource):
         else:
             os.mkdir(path)
 
-        request_threads[index] = YtDownloadManager(UrlRequest(args["video_url"], "Result.mp4", index))
+        request_threads[index] = YtDownloadManager(UrlRequest(args["video_url"], f"Result.{file_format}", index), file_format)
         request_threads[index].start()
 
         request_index = request_index + 1

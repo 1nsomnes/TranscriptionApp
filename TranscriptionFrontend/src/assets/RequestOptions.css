@@ -63,3 +63,21 @@
 .tinputs {
     margin: 10px;
 }
+
+.ytformat {
+    visibility: hidden;
+}
+
+label {
+    font-weight:500;
+}
+
+label:hover {
+    cursor:pointer;
+}
+
+.ytformat:checked + label {
+    border-width: 0px 0px 2px 0px;
+    border-color:white;
+    color:white
+}

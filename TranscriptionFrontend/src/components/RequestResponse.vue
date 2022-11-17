@@ -3,7 +3,8 @@ export default {
     data() {
         return {
             requestProgress: '0',
-            updateDownload: null
+            updateDownload: null,
+            requestDone: false
         }
     },
     created: function() {
@@ -18,8 +19,9 @@ export default {
 
                 res.text().then(text => {
                     this.requestProgress = text;
-                    if(this.requestProgress === '100') {
+                    if(this.requestProgress === 'done') {
                         clearInterval(this.updateDownload)
+                        this.requestDone = true
                     }
                 })
             })
@@ -43,6 +45,8 @@ export default {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen></iframe>
 
-    <p>Request Progress: {{ requestProgress }}%</p>
+    <p>Request Progress: {{ requestProgress }}</p>
+
+    <input v-if="requestDone == true" type="button" value="Download">
 
 </template>

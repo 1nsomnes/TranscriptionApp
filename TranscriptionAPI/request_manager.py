@@ -11,12 +11,15 @@ class UrlRequest:
 class YtDownloadManager(threading.Thread):
     progress = "Loading..."
     request_info:UrlRequest
+    vformat:str
 
     def progressUpdate(self,d):
+        print("hook called", flush=True) #flush lets it print to the main thread
         self.progress = d
 
-    def __init__(self, request_info:UrlRequest):
+    def __init__(self, request_info:UrlRequest, vformat:str):
         self.request_info = request_info
+        self.vformat = vformat
         super().__init__()
 
     def run(self):
@@ -25,9 +28,33 @@ class YtDownloadManager(threading.Thread):
             'outtmpl': f'Requests/{str(self.request_info.request_num)}/{self.request_info.filename}',
             'progress_hooks': [self.progressUpdate]
         }
+        mp3_opts = {
+            'ignoreerrors': True,
+            'outtmpl': f'Requests/{str(self.request_info.request_num)}/{self.request_info.filename}',
+            'format': 'bestaudio/best',
+            'no_check_certificate': True,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192'
+            }],
+            'prefer_ffmpeg': True,
+            'progress_hooks': [self.progressUpdate]
+            
+        }
+
+        if self.vformat == "mp3":
+            opts = mp3_opts
+        else:
+            opts = mp4_opts
+
+        with youtube_dl.YoutubeDL(opts) as ydl:
+            ydl.download((self.request_info.url,)) #use when python only recognizes first letter of string
+
+        print("hook called", flush=True)
+
+        self.progress = "done"
         
-        with youtube_dl.YoutubeDL(mp4_opts) as ydl:
-                ydl.download((self.request_info.url,)) #use when python only recognizes first letter of string
 
 class TranscriptionManager(threading.Thread):
     progress = "Loading..."
