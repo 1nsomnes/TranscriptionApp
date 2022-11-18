@@ -2,9 +2,8 @@ from flask import Flask, send_file, Response, make_response, request
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
 import youtube_dl
-import whisper
 import os, shutil
-from request_manager import YtDownloadManager, UrlRequest
+from request_manager import YtDownloadManager, TranscriptionManager, UrlRequest
 
 request_threads = {}
 request_index = 1
@@ -50,20 +49,10 @@ downloadyt_args.add_argument("format", type=str, help="The format of the video, 
 class RequestProgress(Resource):
     def get(self, index):
         global request_threads
-        #percent = request_threads[index].progress['downloaded_bytes']/request_threads[index].progress['total_bytes']
-        #percent = percent * 100
-        #percent = round(percent, 2)
         response = make_response(request_threads[index].progress, 200)
         response.mimetype = "text/plain"
 
         return response
-
-#this is the hacky way get content-disposition working! 
-class RequestFilename(Resource):
-    def get(self, index):
-        base_path = f"Requests/{index}/"
-        filename = os.listdir(base_path)[0]
-        return {}
 
 
 class RequestResult(Resource):
@@ -79,27 +68,27 @@ class RequestResult(Resource):
 # YouTube URL --> Transcription
 class TranscribeYT(Resource):
     def post(self):
+        global request_index
+
         args = transcribeyt_args.parse_args()
 
         if is_supported(args["video_url"]) == False:
             return "URL submitted was invalid...", 500
 
-        # create new request
+        index = request_index
+        path = f"Requests/{index}"
 
-        return {"request-number", 1}
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        else:
+            os.mkdir(path)
 
-        with youtube_dl.YoutubeDL(mp3_opts) as ydl:
-            ydl.download([args["video_url"]])
-            info_dict = ydl.extract_info(args["video_url"])
+        request_threads[index] = TranscriptionManager(UrlRequest(args["video_url"], f"Result.txt", index))
+        request_threads[index].start()
 
-            path = "Downloads/" + info_dict.get("title", None) + ".mp3"
+        request_index = request_index + 1
 
-        model = whisper.load_model("base")
-        result = model.transcribe(path)
-
-        os.remove(path)
-
-        return {"whisper-response": result["text"]}
+        return {"request-number": str(index)}
 
 
 # YouTube Downloader
@@ -137,7 +126,6 @@ api.add_resource(DownloadYT, "/downloadyt")
 api.add_resource(TranscribeYT, "/transcribeyt")
 api.add_resource(RequestProgress, "/rprogress/<int:index>")
 api.add_resource(RequestResult, "/rdownload/<int:index>")
-api.add_resource(RequestFilename, "/rfilename/<int:index>")
 
 # only used when not in docker container
 if __name__ == '__main__':

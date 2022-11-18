@@ -80,6 +80,6 @@ export default {
 
     <p>Request Progress: {{ requestProgress }}</p>
 
-    <input v-if="requestDone == true" v-on:click="downloadClicked()" type="button" value="Download">
+    <input id="transcribe" v-if="requestDone == true" v-on:click="downloadClicked()" type="button" value="Download">
 
 </template>

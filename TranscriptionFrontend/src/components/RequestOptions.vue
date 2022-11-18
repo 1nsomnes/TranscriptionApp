@@ -2,7 +2,6 @@
 export default {
     data() {
         return {
-            transcription_result: "No request made yet.",
             video_url: "",
             ytformat: "mp3",
             translation_option: "null",
@@ -39,8 +38,15 @@ export default {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             }).then(res => {
-                res.json().then((json_obj) => {
-                    this.transcription_result = json_obj['whisper-response']
+                if(res.status === 500) {
+                    res.text().then(text => {
+                        this.request_error = "Error: " + text;
+                    });
+                    return;
+                }
+
+                res.json().then((json) => {
+                    this.$router.push('/request/' + json['request-number'])
                 })
             }).catch(e => {
                 this.request_error = e;
@@ -71,12 +77,6 @@ export default {
             }).catch(e => {
                 this.request_error = "ERROR:" + e;
             })
-        },
-
-        updatedSelect() {
-            if (this.transcriber_option == 'tmp3' || this.transcriber_option == 'tyt') {
-                this.transcription_result = 'No request made yet.';
-            }
         }
     }
 }
@@ -106,11 +106,6 @@ export default {
     <h3 v-if="request_error != ''" class="tinputs">{{ request_error }}</h3>
     
     <h2 v-if="transcriber_option == 'tl'" class="tinputs">Support for this feature doesn't exist yet...</h2>
-
-    <div v-if="transcriber_option == 'tfile' || transcriber_option == 'tyt'" id="result">
-        <h2 class="tinputs">Result:</h2>
-        <span id="resultSpan" class="tinputs">{{ transcription_result }}</span>
-    </div>
 
     <button id="transcribe" class="tinputs" v-on:click="buttonClicked()">
         Transcribe ➔
