@@ -71,7 +71,10 @@ class RequestResult(Resource):
         base_path = f"Requests/{index}/"
         filename = os.listdir(base_path)[0]
 
-        return send_file(base_path + filename, as_attachment=True, download_name=filename)
+        response = make_response(send_file(base_path + filename, as_attachment=True, download_name=filename))
+        response.headers['Access-Control-Expose-Headers'] = "Content-Disposition"
+
+        return response
 
 # YouTube URL --> Transcription
 class TranscribeYT(Resource):

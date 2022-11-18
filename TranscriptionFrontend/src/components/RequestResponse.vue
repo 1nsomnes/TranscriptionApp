@@ -10,16 +10,19 @@ export default {
     methods: {
         downloadClicked() {
             fetch('http://localhost:4999/rdownload/' + this.$route.params.id, {
-                method: 'GET'
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Access-Control-Expose-Headers': 'Content-Disposition'
+                }
             }).then(res => {
                 if (res.status == '500') { }
-                
-                
-                /*console.log(res.headers)
-                const header = res.headers.get('Content-Disposition');
-                console.log(header)
-                const parts = header.split(';');
-                filename = parts[1].split('=')[1];*/
+
+                let disposition = res.headers.get("Content-Disposition")
+                disposition = disposition.split('filename=')[1].split(';')[0];
+                disposition = disposition.replaceAll('"','')
+
+                console.log(disposition)
 
                 res.blob().then((blob) => {
                     // answer from stackoverflow :/
@@ -27,7 +30,7 @@ export default {
                     var url = window.URL.createObjectURL(blob);
                     var a = document.createElement('a');
                     a.href = url;
-                    a.download = "result.mp3";
+                    a.download = disposition;
                     document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
                     a.click();
                     a.remove();  //afterwards we remove the element again
