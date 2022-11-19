@@ -47,15 +47,13 @@ export default {
             method: 'GET'
         }).then(res => {
             if (res.status == '500') {
-                clearInterval(updateDownload);
-                console.log("received error")
+                this.$router.push('/404')
             }
 
             res.json().then(json => {
                 if (json['url'] !== '') {
                     this.fromYoutube = true;
                     this.ytUrl = json['url'].replace("watch?v=", "embed/")
-                    console.log("Yt URL: " + this.ytUrl)
                 }
             })
         })

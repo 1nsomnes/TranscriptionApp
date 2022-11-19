@@ -50,6 +50,9 @@ class RequestInfo(Resource):
     def get(self, index):
         global request_threads
 
+        if index not in request_threads.keys():
+            return "Request index doesn't exist", 500
+
         rthread = request_threads[index]
 
         return {
@@ -87,7 +90,7 @@ class TranscribeYT(Resource):
         else:
             os.mkdir(path)
 
-        request_threads[index] = TranscriptionManager(UrlRequest(args["video_url"], f"Result.txt", index))
+        request_threads[index] = TranscriptionManager(UrlRequest(index, args["video_url"]))
         request_threads[index].start()
 
         request_index = request_index + 1

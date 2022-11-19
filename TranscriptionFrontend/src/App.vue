@@ -27,7 +27,8 @@
       </span>
       <hr>
       <div id="container">
-        <router-view/>
+        <!-- Reload component on router path changes -->
+        <router-view :key="$route.fullPath"></router-view>
       </div>
     </div>
   </main>
