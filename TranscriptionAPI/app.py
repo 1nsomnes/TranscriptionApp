@@ -1,4 +1,4 @@
-from flask import Flask, send_file, Response, make_response, request
+from flask import Flask, send_file, Response, make_response
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
 import youtube_dl
@@ -46,13 +46,17 @@ downloadyt_args.add_argument(
 downloadyt_args.add_argument("format", type=str, help="The format of the video, mp3 or mp4.")
 
 
-class RequestProgress(Resource):
+class RequestInfo(Resource):
     def get(self, index):
         global request_threads
-        response = make_response(request_threads[index].progress, 200)
-        response.mimetype = "text/plain"
 
-        return response
+        rthread = request_threads[index]
+
+        return {
+            "progress" : rthread.progress,
+            "url" : rthread.request_info.url,
+            "filepath" : rthread.request_info.filepath
+        }
 
 
 class RequestResult(Resource):
@@ -113,7 +117,7 @@ class DownloadYT(Resource):
         else:
             os.mkdir(path)
 
-        request_threads[index] = YtDownloadManager(UrlRequest(args["video_url"], f"Result.{file_format}", index), file_format)
+        request_threads[index] = YtDownloadManager(UrlRequest(index, url=args["video_url"]),file_format)
         request_threads[index].start()
 
         request_index = request_index + 1
@@ -124,7 +128,7 @@ class DownloadYT(Resource):
 
 api.add_resource(DownloadYT, "/downloadyt")
 api.add_resource(TranscribeYT, "/transcribeyt")
-api.add_resource(RequestProgress, "/rprogress/<int:index>")
+api.add_resource(RequestInfo, "/rinfo/<int:index>")
 api.add_resource(RequestResult, "/rdownload/<int:index>")
 
 # only used when not in docker container

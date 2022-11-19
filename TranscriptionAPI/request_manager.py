@@ -4,10 +4,10 @@ import youtube_dl
 import whisper
 
 class UrlRequest:
-    def __init__(self, url:str, filename:str, request_num:int):
+    def __init__(self, request_num:int, url:str = "", filepath:str=""):
         self.url = url
-        self.filename = filename
         self.request_num = request_num
+        self.filepath = filepath
 
 class YtDownloadManager(threading.Thread):
     progress = "Loading..."

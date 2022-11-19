@@ -1,10 +1,14 @@
 <script>
+import { isReferencedIdentifier } from '@vue/compiler-core';
+
 export default {
     data() {
         return {
             requestProgress: '0',
             updateDownload: null,
-            requestDone: false
+            requestDone: false,
+            fromYoutube: false,
+            ytUrl: "https://www.youtube.com/embed/ekPT4ZXXGSM"
         }
     },
     methods: {
@@ -20,7 +24,7 @@ export default {
 
                 let disposition = res.headers.get("Content-Disposition")
                 disposition = disposition.split('filename=')[1].split(';')[0];
-                disposition = disposition.replaceAll('"','')
+                disposition = disposition.replaceAll('"', '')
 
                 console.log(disposition)
 
@@ -39,8 +43,25 @@ export default {
         }
     },
     created: function () {
+        fetch('http://localhost:4999/rinfo/' + this.$route.params.id, {
+            method: 'GET'
+        }).then(res => {
+            if (res.status == '500') {
+                clearInterval(updateDownload);
+                console.log("received error")
+            }
+
+            res.json().then(json => {
+                if (json['url'] !== '') {
+                    this.fromYoutube = true;
+                    this.ytUrl = json['url'].replace("watch?v=", "embed/")
+                    console.log("Yt URL: " + this.ytUrl)
+                }
+            })
+        })
+
         this.updateDownload = setInterval(() => {
-            fetch('http://localhost:4999/rprogress/' + this.$route.params.id, {
+            fetch('http://localhost:4999/rinfo/' + this.$route.params.id, {
                 method: 'GET'
             }).then(res => {
                 if (res.status == '500') {
@@ -48,8 +69,8 @@ export default {
                     console.log("received error")
                 }
 
-                res.text().then(text => {
-                    this.requestProgress = text;
+                res.json().then(json => {
+                    this.requestProgress = json['progress'];
                     if (this.requestProgress === 'done') {
                         clearInterval(this.updateDownload)
                         this.requestDone = true
@@ -73,7 +94,7 @@ export default {
 <template>
     <h2 style="color:white">Request #{{ $route.params.id }}</h2>
 
-    <iframe width="640" height="480" src="https://www.youtube.com/embed/ekPT4ZXXGSM"
+    <iframe v-if="fromYoutube == true" width="640" height="480" v-bind:src="this.ytUrl"
         title="YouTube Speech Recognition Test - good audio" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen></iframe>

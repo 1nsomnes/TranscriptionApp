@@ -31,8 +31,6 @@ export default {
                 "translate": this.translation_option
             }
 
-            this.transcription_result = "Processing..."
-
             fetch("http://localhost:4999/transcribeyt", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -87,7 +85,7 @@ export default {
 </style>
 
 <template>
-    <select v-model="transcriber_option" v-on:change="updatedSelect" id="toptions">
+    <select v-model="transcriber_option" id="toptions">
         <option value="dyt">Download YouTube Video</option>
         <option value="tfile">Transcribe From File</option>
         <option value="tyt">Transcribe From YouTube</option>
