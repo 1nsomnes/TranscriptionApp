@@ -9,9 +9,26 @@ export default {
             request_error: ""
         }
     },
+    created: function() {
+        if (this.$cookies.keys().includes('requests')) {
+            console.log(this.$cookies.get('requests'))
+        }
+    },
     methods: {
-        setCookies() {
-
+        setCookies(request_value) {
+            if (!this.$cookies.keys().includes('requests')) {
+                this.$cookies.set('requests', JSON.stringify(
+                    {
+                        "value" : [request_value]
+                    }),     
+                    '30d');
+            } else {
+                let json_obj = this.$cookies.get('requests');
+                let request_array = Array.from(json_obj['value']);
+                request_array.push(request_value);
+                json_obj['value'] = request_array;
+                this.$cookies.set('requests', JSON.stringify(json_obj), '30d');
+            }
         }, 
         buttonClicked() {
             this.request_error = '';
@@ -48,9 +65,7 @@ export default {
 
                 res.json().then((json) => {
                     // set cookies 
-
-                    
-                    this.$cookies.set('test', 'value', "30d");
+                    this.setCookies(json['request-number'])
                     this.$router.push('/request/' + json['request-number'])
                 })
             }).catch(e => {
@@ -77,7 +92,8 @@ export default {
                 }
                 
                 res.json().then(json => {
-                    this.$router.push('/request/' + json['request-number'])
+                    this.setCookies(json['request-number']);
+                    this.$router.push('/request/' + json['request-number']);
                 })
             }).catch(e => {
                 this.request_error = "ERROR:" + e;
