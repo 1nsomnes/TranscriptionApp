@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
+import VueCookies from "vue-cookies";
 import App from './App.vue'
 
 import RequestOptions from './components/RequestOptions.vue'
@@ -26,6 +27,7 @@ const router = createRouter({
 const app = createApp(App);
 
 app.use(router)
+app.use(VueCookies)
 
 app.mount("#app")
 

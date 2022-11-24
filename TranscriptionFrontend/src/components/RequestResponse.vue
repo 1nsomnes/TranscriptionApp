@@ -1,6 +1,4 @@
 <script>
-import { isReferencedIdentifier } from '@vue/compiler-core';
-
 export default {
     data() {
         return {

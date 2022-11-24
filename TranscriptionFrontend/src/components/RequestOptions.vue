@@ -10,6 +10,9 @@ export default {
         }
     },
     methods: {
+        setCookies() {
+
+        }, 
         buttonClicked() {
             this.request_error = '';
             switch (this.transcriber_option) {
@@ -44,6 +47,10 @@ export default {
                 }
 
                 res.json().then((json) => {
+                    // set cookies 
+
+                    
+                    this.$cookies.set('test', 'value', "30d");
                     this.$router.push('/request/' + json['request-number'])
                 })
             }).catch(e => {
