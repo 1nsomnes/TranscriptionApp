@@ -10,7 +10,9 @@ export default {
                 method: 'GET'
             }).then(res => {
                 if (res.status == '500') {
-                    console.log("received error")
+                    this.$emit('nonexistant', this.requestNumber);
+                    console.log("received error");
+                    return;
                 }
 
                 res.json().then(json => {
@@ -25,6 +27,9 @@ export default {
                         this.status = percent + "%";
                     }
                 })
+            }).catch(e => {
+                //TODO: fix error handling 
+                console.log("Error: " + e)
             })
         }
     },

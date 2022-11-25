@@ -14,8 +14,6 @@ export default {
     },
     created: function() {
         if (this.$cookies.keys().includes('requests')) {
-            //TODO: check if keys still exist 
-
             let json_obj = this.$cookies.get('requests')
             this.request_list = json_obj['value']
         }
@@ -104,6 +102,16 @@ export default {
             }).catch(e => {
                 this.request_error = "ERROR:" + e;
             })
+        },
+        removeRequest(id) {
+            this.request_list = this.request_list.filter(item => item !== id);
+            let json_obj = this.$cookies.get('requests');
+            json_obj['value'] = this.request_list;
+            if(this.request_list.length === 0) {
+                this.$cookies.set('requests', json_obj);
+            } else {
+                this.$cookies.set('requests', json_obj);
+            }
         }
     }, 
     components: {
@@ -143,7 +151,7 @@ export default {
 
     <div id="prevreqs">
         <h1 style="color:white;">Previous Requests</h1>
-        <PreviousRequests v-for="req in this.request_list" :requestNumber="req"></PreviousRequests>
+        <PreviousRequests @nonexistant="removeRequest" v-for="req in this.request_list" :requestNumber="req"></PreviousRequests>
         <h3 v-if="this.request_list.length == 0">No requests have been made yet... Make one above!</h3>
     </div>
 </template>
