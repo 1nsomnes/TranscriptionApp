@@ -1,4 +1,6 @@
 <script>
+import PreviousRequests from './PreviousRequests.vue'
+
 export default {
     data() {
         return {
@@ -6,12 +8,16 @@ export default {
             ytformat: "mp3",
             translation_option: "null",
             transcriber_option: "dyt",
-            request_error: ""
+            request_error: "",
+            request_list: []
         }
     },
     created: function() {
         if (this.$cookies.keys().includes('requests')) {
-            console.log(this.$cookies.get('requests'))
+            //TODO: check if keys still exist 
+            
+            let json_obj = this.$cookies.get('requests')
+            this.request_list = json_obj['value']
         }
     },
     methods: {
@@ -99,6 +105,9 @@ export default {
                 this.request_error = "ERROR:" + e;
             })
         }
+    }, 
+    components: {
+      PreviousRequests
     }
 }
 </script>
@@ -131,4 +140,9 @@ export default {
     <button id="transcribe" class="tinputs" v-on:click="buttonClicked()">
         Transcribe ➔
     </button>
+
+    <div id="prevreqs">
+        <h1>Previous Requests</h1>
+        <PreviousRequests v-for="req in this.request_list" :requestNumber="req"></PreviousRequests>
+    </div>
 </template>
