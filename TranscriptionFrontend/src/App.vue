@@ -5,6 +5,11 @@
   export default {
     components: {
       RequestOptions
+    },
+    methods: {
+      titleClicked() {
+        this.$router.push('/')
+      }
     }
   }
 </script>
@@ -19,7 +24,7 @@
 
   <main>
     <div id="box">
-      <h1>T R A N S C R I B E R</h1>
+      <h1 v-on:click="titleClicked">T R A N S C R I B E R</h1>
       <span class="queryBoxElements" id="description">
         Integration of
         <a href="https://google.com">OpenAI's Whisper</a>

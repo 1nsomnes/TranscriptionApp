@@ -15,7 +15,7 @@ export default {
     created: function() {
         if (this.$cookies.keys().includes('requests')) {
             //TODO: check if keys still exist 
-            
+
             let json_obj = this.$cookies.get('requests')
             this.request_list = json_obj['value']
         }
@@ -142,7 +142,7 @@ export default {
     </button>
 
     <div id="prevreqs">
-        <h1>Previous Requests</h1>
+        <h1 style="color:white;">Previous Requests</h1>
         <PreviousRequests v-for="req in this.request_list" :requestNumber="req"></PreviousRequests>
     </div>
 </template>

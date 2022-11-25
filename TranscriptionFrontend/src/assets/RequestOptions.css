@@ -81,3 +81,7 @@ label:hover {
     border-color:white;
     color:white
 }
+
+#prevreqs {
+    margin-top: 8vh;
+}

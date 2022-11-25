@@ -45,7 +45,7 @@ downloadyt_args.add_argument(
     "video_url", type=str,  help="YouTube video URL to download from.", required=True)
 downloadyt_args.add_argument("format", type=str, help="The format of the video, mp3 or mp4.")
 
-
+#TODO: add more robust info requests 
 class RequestInfo(Resource):
     def get(self, index):
         global request_threads

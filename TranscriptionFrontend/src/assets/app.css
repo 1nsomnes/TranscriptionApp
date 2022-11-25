@@ -17,6 +17,10 @@ section {
     margin: 10px;
 }
 
+#box>h1:hover {
+    cursor:pointer;
+}
+
 #container {
     border-radius: 10px;
     padding: 20px 10px;

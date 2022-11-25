@@ -45,7 +45,7 @@ export default {
             method: 'GET'
         }).then(res => {
             if (res.status == '500') {
-                this.$router.push('/404')
+                this.$router.push('/norequest')
             }
 
             res.json().then(json => {

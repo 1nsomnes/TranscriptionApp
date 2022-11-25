@@ -11,8 +11,10 @@ export default {
 
 <style scoped>
     #element {
-       background-color: gray; 
-       color: white;
+       background-color: rgb(70, 68, 68); 
+       padding: 10px;
+       border-radius: 8px;
+       margin: 10px 0px;
     }
     #element:hover {
         cursor:pointer;
@@ -20,7 +22,8 @@ export default {
 </style>
 
 <template> 
+    <!-- TODO: Add more personal request title information -->
     <div id="element" v-on:click="requestClicked">
-        {{ requestNumber }}
+        Request {{ requestNumber }}
     </div>
 </template>

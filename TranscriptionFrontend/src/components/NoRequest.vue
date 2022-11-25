@@ -25,8 +25,8 @@ export default {
 </style>
 
 <template> 
-<h1>Error 404</h1>
-<h3>Oops! The page you're looking for doesn't exist...
+<h1>Request Not Found</h1>
+<h3>Oops! The request you're looking for has not been found...
     <a v-on:click="homeClicked">Return home</a>
 </h3>
 </template>
