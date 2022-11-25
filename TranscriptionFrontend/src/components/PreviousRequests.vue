@@ -4,7 +4,32 @@ export default {
     methods: {
         requestClicked() {
             this.$router.push('/request/' + this.requestNumber);
+        },
+        updateInfo() {
+            fetch('http://localhost:4999/rinfo/' + this.requestNumber, {
+                method: 'GET'
+            }).then(res => {
+                if (res.status == '500') {
+                    console.log("received error")
+                }
+
+                res.json().then(json => {
+                    this.title = json['title']
+                    this.info = json['data']
+                    this.status = json['progress']
+                })
+            })
         }
+    }, 
+    data() {
+        return {
+            title: "Unloaded title...",
+            info: "Unloaded info...",
+            status: "Unloaded status..."
+        }
+    },
+    created: function() {
+        this.updateInfo();
     }
 }
 </script>
@@ -24,6 +49,9 @@ export default {
 <template> 
     <!-- TODO: Add more personal request title information -->
     <div id="element" v-on:click="requestClicked">
-        Request {{ requestNumber }}
+        {{ this.title}}
+        Id: {{ requestNumber }}
+        Info: {{ this.info }}
+        Status: {{ this.status }}
     </div>
 </template>

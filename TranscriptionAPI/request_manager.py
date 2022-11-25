@@ -4,10 +4,11 @@ import youtube_dl
 import whisper
 
 class UrlRequest:
-    def __init__(self, request_num:int, url:str = "", filepath:str=""):
+    def __init__(self, request_num:int, url:str = "", data:str = "No data", title:str="Unloaded Title..."):
         self.url = url
         self.request_num = request_num
-        self.filepath = filepath
+        self.data = data 
+        self.title = title
 
 class YtDownloadManager(threading.Thread):
     progress = "Loading..."
@@ -50,6 +51,11 @@ class YtDownloadManager(threading.Thread):
             opts = mp4_opts
 
         with youtube_dl.YoutubeDL(opts) as ydl:
+            info_dict = ydl.extract_info(self.request_info.url)
+            video_title = info_dict.get('title', None)
+
+            self.request_info.title = video_title
+
             ydl.download((self.request_info.url,)) #use when python only recognizes first letter of string
 
         self.progress = "done"
@@ -60,7 +66,6 @@ class TranscriptionManager(threading.Thread):
     request_info:UrlRequest
 
     def progressUpdate(self,d):
-        #print("hook called", flush=True) #flush lets it print to the main thread
         self.progress = d
 
     def __init__(self, request_info:UrlRequest):
@@ -83,6 +88,11 @@ class TranscriptionManager(threading.Thread):
         }
 
         with youtube_dl.YoutubeDL(mp3_opts) as ydl:
+            info_dict = ydl.extract_info((self.request_info.url,))
+            video_title = info_dict.get('title', None)
+
+            self.request_info.title = video_title
+
             ydl.download((self.request_info.url,))
 
         self.progress = "Machine Learning Algorithms Running..."

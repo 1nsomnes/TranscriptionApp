@@ -45,7 +45,6 @@ downloadyt_args.add_argument(
     "video_url", type=str,  help="YouTube video URL to download from.", required=True)
 downloadyt_args.add_argument("format", type=str, help="The format of the video, mp3 or mp4.")
 
-#TODO: add more robust info requests 
 class RequestInfo(Resource):
     def get(self, index):
         global request_threads
@@ -58,7 +57,8 @@ class RequestInfo(Resource):
         return {
             "progress" : rthread.progress,
             "url" : rthread.request_info.url,
-            "filepath" : rthread.request_info.filepath
+            "data": rthread.request_info.data,
+            "title": rthread.request_info.title
         }
 
 
@@ -90,7 +90,7 @@ class TranscribeYT(Resource):
         else:
             os.mkdir(path)
 
-        request_threads[index] = TranscriptionManager(UrlRequest(index, args["video_url"]))
+        request_threads[index] = TranscriptionManager(UrlRequest(index, url=args["video_url"], data="Transcribing"))
         request_threads[index].start()
 
         request_index = request_index + 1
@@ -120,7 +120,7 @@ class DownloadYT(Resource):
         else:
             os.mkdir(path)
 
-        request_threads[index] = YtDownloadManager(UrlRequest(index, url=args["video_url"]),file_format)
+        request_threads[index] = YtDownloadManager(UrlRequest(index, url=args["video_url"], data=f"Downloading video as {file_format}"),file_format)
         request_threads[index].start()
 
         request_index = request_index + 1
