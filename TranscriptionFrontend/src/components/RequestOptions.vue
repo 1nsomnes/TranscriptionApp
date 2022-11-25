@@ -144,5 +144,6 @@ export default {
     <div id="prevreqs">
         <h1 style="color:white;">Previous Requests</h1>
         <PreviousRequests v-for="req in this.request_list" :requestNumber="req"></PreviousRequests>
+        <h3 v-if="this.request_list.length == 0">No requests have been made yet... Make one above!</h3>
     </div>
 </template>
