@@ -88,6 +88,7 @@ export default {
 
 
 <template>
+    <!-- TODO: add more personalized request page + fix youtube vid not loading -->
     <h2 style="color:white">Request #{{ $route.params.id }}</h2>
 
     <iframe v-if="fromYoutube == true" width="640" height="480" v-bind:src="this.ytUrl"
