@@ -88,7 +88,7 @@ class TranscriptionManager(threading.Thread):
         }
 
         with youtube_dl.YoutubeDL(mp3_opts) as ydl:
-            info_dict = ydl.extract_info((self.request_info.url,))
+            info_dict = ydl.extract_info(self.request_info.url)
             video_title = info_dict.get('title', None)
 
             self.request_info.title = video_title
