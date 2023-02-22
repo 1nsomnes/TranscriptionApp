@@ -16,6 +16,12 @@
     cursor: pointer;
 }
 
+#toptions option {
+    background-color: gray;
+    color:white;
+}
+
+
 #transcribe {
     background-color: transparent;
     border-style: solid;
