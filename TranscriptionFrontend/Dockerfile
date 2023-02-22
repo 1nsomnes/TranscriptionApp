@@ -1,7 +1,5 @@
 FROM node:latest
 
-WORKDIR /Users/cedricclaessens/Documents/programming/fullstack/TransctiptionApp/TranscriptionFrontend
-
 COPY . .
 
 RUN npm install 

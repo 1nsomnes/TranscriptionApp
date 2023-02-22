@@ -9,10 +9,16 @@ RUN pip install flask==2.2.2 \
     pip install git+https://github.com/openai/whisper.git \
     pip install setuptools-rust==1.5.2 \
     pip install gunicorn 
-    
-WORKDIR /Users/cedricclaessens/Documents/programming/python/TranscriptionApp-WhisperEnd
 
 COPY . . 
+
+#recent update to youtube messed up the way the extractor works
+#implemented the solution found here: https://forum.videohelp.com/threads/408650-No-longer-able-to-download-videos-with-youtube-dl-exe 
+#and copied it into my container
+RUN rm /usr/local/lib/python3.10/site-packages/youtube_dl/extractor/youtube.py
+COPY ./youtube.py /usr/local/lib/python3.10/site-packages/youtube_dl/extractor
+RUN rm ./youtube.py
+
 
 EXPOSE 4999
 

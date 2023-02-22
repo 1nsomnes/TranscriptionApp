@@ -118,7 +118,8 @@ class DownloadYT(Resource):
         if os.path.exists(path):
             shutil.rmtree(path)
         else:
-            os.mkdir(path)
+            #in the event that more than one of dirs don't exist make them all
+            os.makedirs(path)
 
         request_threads[index] = YtDownloadManager(UrlRequest(index, url=args["video_url"], data=f"Downloading video as {file_format}"),file_format)
         request_threads[index].start()
