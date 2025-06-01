@@ -1,7 +1,9 @@
 FROM node:latest
 
-COPY . .
+# stop node from stopping because it takes too much memory
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
+COPY . .
 RUN npm install 
 
 EXPOSE 4998

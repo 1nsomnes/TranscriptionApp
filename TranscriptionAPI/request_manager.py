@@ -1,6 +1,6 @@
 import os
 import threading;
-import youtube_dl
+import yt_dlp
 import whisper
 
 class UrlRequest:
@@ -50,7 +50,7 @@ class YtDownloadManager(threading.Thread):
         else:
             opts = mp4_opts
 
-        with youtube_dl.YoutubeDL(opts) as ydl:
+        with yt_dlp.YoutubeDL(opts) as ydl:
             info_dict = ydl.extract_info(self.request_info.url)
             video_title = info_dict.get('title', None)
 
@@ -87,7 +87,7 @@ class TranscriptionManager(threading.Thread):
             'progress_hooks': [self.progressUpdate]
         }
 
-        with youtube_dl.YoutubeDL(mp3_opts) as ydl:
+        with yt_dlp.YoutubeDL(mp3_opts) as ydl:
             info_dict = ydl.extract_info(self.request_info.url)
             video_title = info_dict.get('title', None)
 
